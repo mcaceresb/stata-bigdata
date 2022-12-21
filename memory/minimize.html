@@ -1,0 +1,862 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="How to work efficiently with large datasets (in Stata); BPLIM December 2022 Presentation for the Workshop on Empirical Research with Large Datasets">
+      
+      
+      
+        <link rel="canonical" href="https://mcaceresb.github.io/stata-bigdata/memory/minimize.html">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.15">
+    
+    
+      
+        <title>Minimize Memory Use - Stata and Big Data</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.c382b1dc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cc9b2e1e.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#546d78">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i%7CInconsolata:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Open Sans";--md-code-font:"Inconsolata"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra-material.css">
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue-grey" data-md-color-accent="blue-grey">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#minimize-memory-use" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="Stata and Big Data" class="md-header__button md-logo" aria-label="Stata and Big Data" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Stata and Big Data
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Minimize Memory Use
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/mcaceresb/stata-bigdata" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mcaceresb/stata-bigdata
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="Stata and Big Data" class="md-nav__button md-logo" aria-label="Stata and Big Data" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Stata and Big Data
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/mcaceresb/stata-bigdata" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mcaceresb/stata-bigdata
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../break.html" class="md-nav__link">
+        What can break?
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Memory Management
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Memory Management" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Memory Management
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Minimize Memory Use
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="minimize.html" class="md-nav__link md-nav__link--active">
+        Minimize Memory Use
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#use-small-variable-types" class="md-nav__link">
+    Use Small Variable Types
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#make-sure-numbers-are-numbers" class="md-nav__link">
+    Make sure numbers are numbers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-can-memory-use-blow-up-anyway" class="md-nav__link">
+    Why can memory use blow up anyway?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#short-demo-with-mata-frames-and-python" class="md-nav__link">
+    Short demo with mata, frames, and Python
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="swapping.html" class="md-nav__link">
+        Caution! Swapping
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Efficient Code
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Efficient Code" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Efficient Code
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efficient/trade-off.html" class="md-nav__link">
+        Trade-Off
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efficient/plan-ahead.html" class="md-nav__link">
+        Planning Ahead
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efficient/other-resources.html" class="md-nav__link">
+        Other Resources
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efficient/gtools.html" class="md-nav__link">
+        Gtools
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5" type="checkbox" id="__nav_4_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4_5">
+          Better Algorithms
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Better Algorithms" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_5">
+          <span class="md-nav__icon md-icon"></span>
+          Better Algorithms
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efficient/algorithms/introduction.html" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efficient/algorithms/merge.html" class="md-nav__link">
+        Merge
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efficient/algorithms/bootstrap.html" class="md-nav__link">
+        Bootstrap
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../efficient/right-tool.html" class="md-nav__link">
+        The Right Tool
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tips.html" class="md-nav__link">
+        Tips and Tricks/Summary
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#use-small-variable-types" class="md-nav__link">
+    Use Small Variable Types
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#make-sure-numbers-are-numbers" class="md-nav__link">
+    Make sure numbers are numbers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-can-memory-use-blow-up-anyway" class="md-nav__link">
+    Why can memory use blow up anyway?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#short-demo-with-mata-frames-and-python" class="md-nav__link">
+    Short demo with mata, frames, and Python
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/mcaceresb/stata-bigdata/blob/main/docs/memory/minimize.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+<h1 id="minimize-memory-use">Minimize Memory Use</h1>
+<h3 id="use-small-variable-types">Use Small Variable Types</h3>
+<p>Stata has multiple variable types. The default is <code>float</code>, and you can see <a href="break.md">here</a> why storing everything as a float can lead to problems. However, storing everything as a double is excessive in most situations. In general, store variables in the smallest sensible type for the data they have:</p>
+<ul>
+<li>double: Largest number type (8 bytes). Integers in -/+ 2<sup>53</sup>, numbers in -/+ 8.988e307.</li>
+<li>float: Stata default type (4 bytes). Integers in -/+ 2<sup>24</sup>, numbers in -/+ 1.701e38.</li>
+<li>long: Largest integer type (4 bytes). Integers from -2<sup>31</sup>+1 to 2<sup>31</sup>-28.</li>
+<li>int: Small integer type (2 bytes). Integers from -2<sup>15</sup>+1 to 2<sup>15</sup>-28.</li>
+<li>byte: Smallest integer type (1 bytes). Integers from -2<sup>7</sup>+1 to 2<sup>7</sup>-28.</li>
+<li>str#: String data from str1 to str2045 (one byte per character; e.g. str10 is 10 bytes).</li>
+<li>strL: Arbitrary data (in general, binary data, but includes strings of variable width) up to 2e9 bytes per row (has a 80 byte overhead, so storage is 80 bytes per row plus the space taken up by the data it stores).</li>
+</ul>
+<p>In general you'll use <code>float</code> for reals (by default), <code>long</code> for integers, and str# for strings. However, there are plenty of variables that are bounded and you can save memory by using <code>byte</code> (e.g. indicators, sparse categorical variables) or <code>int</code> (e.g. dates, day of the year).</p>
+<ul>
+<li>It's often hard to know the best type to use for all your variables (and sometimes, when coding quickly, you can simply forger to use anything other than the default for numbers and <code>long</code> for integers).</li>
+<li><code>compress</code> is a Stata command that recasts all your variables as the smallest safe type.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Always compress data</p>
+<p>It is <em><strong>always</strong></em> (almost) a good idea, and always safe, to use <code>compress</code>
+on your data. The only scenario you wouldn't do that is if you
+cannot spare the computing time (compress can be very cpu-intensive in
+some cases).</p>
+</div>
+<p>In this case, compression refers specifically to variable recasting to save memory and is a completely lossless operation: The exact same data is retained, but wastefully allocated space is freed. (In many other computing settings, compression refers to encoding information in fewer bytes to save space; in other words, the data is altered so the encoded version takes up less space, and the original copy can be recovered by uncompressing the data. Stata's <code>compress</code> does <strong><em>not</em></strong> refer to this.)</p>
+<div class="admonition tip">
+<p class="admonition-title">Anecdote: Poorly typed data</p>
+<p>I once received a Stata file over 150GiB in size. While it had close
+to 160M rows, it only had 6 variables. I noticed 4 were string
+variables of type str256, but some quick exploration revealed they
+were really str8. I looped through the data in chunks, using compress
+on each chunk, and then appended the chunks at the end. (By chunk I mean
+a range of rows, which is efficient in Stata as data is stored by row; I
+did it this way to avoid reading too much data into memory at a time.) 
+The final data only took up around 5GiB.</p>
+</div>
+<h3 id="make-sure-numbers-are-numbers">Make sure numbers are numbers</h3>
+<p>It almost always takes less memory to store numbers as numbers than as strings, but very often data that should be numeric is stored as string (this can happen often when, for example, importing external data).</p>
+<ul>
+<li>
+<p><code>destring varlist, replace</code> is a safe way of making sure you don't have any numbers hidden in strings. As <code>compress</code>, there are situations where it can be cpu-intensive, but if your strings contain non-numeric data it will not force them to become numbers. The only (default) caveat as far as I know is that missing values are interpreted, even though they're not numbers per se (so <code>.</code>, <code>.a</code>, <code>.b</code> and so on are read as a missing values).</p>
+</li>
+<li>
+<p>Sometimes you need to be a bit more proactive: Say you have hourly wages, rounded, for a group of individuals (€20, €30, etc.) truncated above by €1,000. If you import this data into Stata, it would be stored as str6, but it can be stored as a 2-byte integer. In straightforward cases like this, you can just use the <code>ignore</code> option in <code>destring</code>, but in general you may need to clean up your strings before converting them to numbers:</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><code>.<span class="k"> clear</span>
+.<span class="k"> qui set</span> obs <span class="m">3</span>
+.<span class="k"> qui gen</span> str6 wages = <span class="s">&quot;€20&quot;</span><span class="k"> in</span> <span class="m">1</span>
+.<span class="k"> qui replace</span>  wages = <span class="s">&quot;€30&quot;</span><span class="k"> in</span> <span class="m">2</span>
+.<span class="k"> qui replace</span>  wages = <span class="s">&quot;€1,000&quot;</span><span class="k"> in</span> <span class="m">3</span>
+.<span class="k"> destring</span> wages,<span class="k"> replace</span>
+wages: contains nonnumeric characters;<span class="k"> no replace</span>
+.<span class="k"> destring</span> wages,<span class="k"> replace</span> ignore(<span class="s">&quot;€,&quot;</span>)
+wages: characters € , removed; replaced<span class="k"> as</span> int
+</code></pre></div>
+<h3 id="why-can-memory-use-blow-up-anyway">Why can memory use blow up anyway?</h3>
+<p>Most ancillary objects take little memory (with exceptions), but many programs make copies of the data internally.</p>
+<ul>
+<li>
+<p>It's often not possible to modify the data in place.</p>
+</li>
+<li>
+<p>Even if possible, it's often more efficient to make copies.</p>
+</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>
+<p><code>gtools</code> has to make a copy of all the variables that will be used, in addition to all internal objects. It can be a memory hog!</p>
+</li>
+<li>
+<p><code>parallel</code> makes copies of all ancillary objects and starts sepparate instances of Stata, each with its own resource use. For "normal" use cases, each instance would only have a cut of the data, so the memory overhead should be minimal. However, depending on your operation, memory use can increase by up to the number of cores requested.</p>
+</li>
+<li>
+<p><code>mata</code>, <code>frame</code>, and <code>python</code> can all make large objects independent of what is stored in the current dataset.</p>
+</li>
+</ul>
+<h3 id="short-demo-with-mata-frames-and-python">Short demo with mata, frames, and Python</h3>
+<div class="highlight"><pre><span></span><code><span class="k">log</span> using memtest<span class="m">.</span>log,<span class="k"> replace</span>
+<span class="c1">* Define function to check this Stata instance&#39;s current memory</span>
+python:
+import os, psutil
+
+def checK_memory():
+<span class="k">    print</span>(f<span class="s">&quot;{psutil.Process(os.getpid()).memory_info().rss / 1024**2:,.1f} MiB in use&quot;</span>)<span class="k"></span>
+<span class="k">end</span>
+
+<span class="c1">* Check space taken by integer ID</span>
+python: checK_memory()<span class="k"></span>
+<span class="k">set</span> obs <span class="nv">`:disp %12.0f 1e8&#39;</span><span class="k"></span>
+<span class="k">gen</span> <span class="nv">`c(obs_t)&#39;</span> id = _n
+python: checK_memory()
+
+<span class="c1">* Total space after copying to mata</span><span class="k"></span>
+<span class="k">mata</span> id = st_data(., <span class="s">&quot;id&quot;</span>)
+python: checK_memory()
+
+<span class="c1">* Total space after copying to second frame</span>
+frame put id, into(id)
+python: checK_memory()
+
+<span class="c1">* Total space after copying to Python</span>
+python:
+from sfi import Data
+id = Data<span class="m">.</span><span class="nf">get</span>(var=<span class="s">&quot;id&quot;</span>)
+checK_memory()<span class="k"></span>
+<span class="k">end</span>
+
+<span class="c1">* Check space after droping each object</span><span class="k"></span>
+<span class="k">drop</span> id
+python: checK_memory()<span class="k"></span>
+<span class="k">mata mata drop</span> id
+python: checK_memory()
+frame<span class="k"> drop</span> id
+python: checK_memory()
+python: id=None
+python: checK_memory()
+
+<span class="c1">* Check objects were dropped</span>
+frame<span class="k"> dir</span>
+<span class="k">mata mata desc</span>
+python: [k<span class="k"> for</span> k<span class="k"> in</span> globals().keys()<span class="k"> if</span> not k<span class="m">.</span>startswith(&#39;_&#39;)]<span class="k"></span>
+<span class="k">log close</span> _all
+</code></pre></div>
+<p>These are the statements printed by each <code>checK_memory</code> invocation, in Stata 17/MP:</p>
+<ul>
+<li>
+<p>38.7 MiB: Baseline memory use.</p>
+</li>
+<li>
+<p>610.8 MiB: Minimum space taken up by 4-byte variable with 100M rows is 381.5 MiB; you can see Stata has an additional 190MiB overhead; this overhead will vary depending on your dataset.</p>
+</li>
+<li>
+<p>1,374.3 MiB: Mata stores numbers as 8-byte doubles; minimum space taken up with 100M rows is 762.9 MiB; you can see there was virtually no overhead in this case.</p>
+</li>
+<li>
+<p>1,946.8 MiB: This effectively makes a copy of the current data frame; it's not too surprising that the additional memory is almost identical here than vs the first step.</p>
+</li>
+<li>
+<p>5,773.5 MiB: Python should store a copy as a double similar to mata; however, we can see python's overhead is nearly 3GiB in this case. I am not entirely sure why this happens, but you should certainly be quite mindful of this when interfacing with Python from Stata. It seems there's intermediate objects that are created in a way that is not always memory-efficient.</p>
+</li>
+<li>
+<p>5,773.5 MiB: Here I dropped the <code>id</code> variable but  memory requirements stayed the same. I'm not entirely sure why this is, but this doesn't happen if you don't make all the copies of the ID variables we made (e.g. try dropping <code>id</code> right after creation and then run <code>python: check_memory()</code>). My guess is that Stata is trying to be smart about your  memory requirements and is concluding that you might need it in the future.</p>
+</li>
+<li>
+<p>5,012.7 MiB:  Dropped mata object <code>id</code>.</p>
+</li>
+<li>
+<p>4,438.5 MiB: Dropped frame <code>id</code>.</p>
+</li>
+<li>
+<p>613.2 MiB: Dropped Python object; again, the drop is disproportionate to what we might expect, shoring <code>python</code> has a hefty memory overhead from within Stata.</p>
+</li>
+</ul>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../break.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: What can break?" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              What can break?
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="swapping.html" class="md-footer__link md-footer__link--next" aria-label="Next: Caution! Swapping" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Caution! Swapping
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a6c66575.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
