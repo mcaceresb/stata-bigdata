@@ -1,0 +1,75 @@
+# Project information
+site_name:        'Stata and Big Data'
+site_description: 'How to work efficiently with large datasets (in Stata); BPLIM December 2022 Presentation for the Workshop on Empirical Research with Large Datasets'
+
+# Repository
+repo_name: 'mcaceresb/stata-bigdata'
+repo_url: 'https://github.com/mcaceresb/stata-bigdata'
+edit_uri: 'blob/main/docs'
+site_url: 'https://mcaceresb.github.io/stata-bigdata'
+
+nav:
+    - Home:                    index.md
+    - What can break?:         break.md
+    - Memory Management:
+        Minimize Memory Use:   memory/minimize.md
+        Caution! Swapping:     memory/swapping.md
+    - Efficient Code:
+        Trade-Off:             efficient/trade-off.md
+        Planning Ahead:        efficient/plan-ahead.md
+        Other Resources:       efficient/other-resources.md
+        Gtools:                efficient/gtools.md
+        Better Algorithms:
+          Introduction:        efficient/algorithms/introduction.md
+          Merge:               efficient/algorithms/merge.md
+          Bootstrap:           efficient/algorithms/bootstrap.md
+        The Right Tool:        efficient/right-tool.md
+    - Tips and Tricks/Summary: tips.md
+
+theme:
+    name: 'material'
+    palette:
+        primary: 'blue grey'
+        accent:  'blue grey'
+    font:
+        text: 'Open Sans'
+        code: 'Inconsolata'
+
+markdown_extensions:
+    - meta
+    - toc
+    - tables
+    - fenced_code
+    - admonition
+    - pymdownx.highlight:
+        use_pygments: true
+    - pymdownx.superfences
+    - pymdownx.arithmatex:
+        generic: true
+
+# extra_javascript:
+#     - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+#     - helpers.js
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+# - codehilite:
+#     use_pygments: true
+#     guess_lang: false
+
+# noclasses:      True
+# pygments_style: monokai
+
+use_directory_urls: false
+
+extra_css:
+    - css/extra-material.css
+
+# extra_css:
+#     - css/extra-rtd.css
+#     - css/extra-material.css
+#     - css/extra-material-dark.css
+
